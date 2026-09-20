@@ -1,8 +1,9 @@
 import os
+import asyncio
 from pyrogram import Client, filters
 from pyrogram.types import Message
 
-# Environment variables se credentials uthayenge (GitHub/Render par secure rakhne ke liye)
+# Environment variables se credentials uthayenge
 API_ID = int(os.environ.get("API_ID", 0))
 API_HASH = os.environ.get("API_HASH", "")
 BOT_TOKEN = os.environ.get("BOT_TOKEN", "")
@@ -27,23 +28,18 @@ async def start_command(client, message: Message):
 async def save_content(client, message: Message):
     text = message.text
     
-    # Check karenge ki message mein Telegram post link hai ya nahi
     if "t.me/" in text:
         try:
             await message.reply_text("🔄 File fetch ho rahi hai, kripya intezaar karein...")
             
-            # Link se chat username aur message ID nikalna
             parts = text.split("/")
             msg_id = int(parts[-1])
             
-            # Agar public channel hai toh uska username/ID milega
             if "c/" in text:
-                # Private channel link format: t.me/c/xxxx/123
                 chat_id = int("-100" + parts[-2])
             else:
                 chat_id = parts[-2]
 
-            # Message ko fetch karke direct user ke paas bhej dena (Saved Messages ki tarah)
             await client.copy_message(
                 chat_id=message.chat.id,
                 from_chat_id=chat_id,
@@ -55,7 +51,8 @@ async def save_content(client, message: Message):
     else:
         await message.reply_text("⚠️ Kripya ek valid Telegram post link bhejiye.")
 
-# Bot ko run karne ke liye
-print("🤖 Bot started successfully...")
-app.run()
-
+# Naye method se event loop handle karne ke liye
+if __name__ == "__main__":
+    print("🤖 Bot started successfully...")
+    app.run()
+    
